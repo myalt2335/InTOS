@@ -10,20 +10,19 @@
       color: white;
       font-family: monospace;
       padding: 20px;
+      overflow-y: auto;
     }
     #terminal {
       white-space: pre-wrap;
     }
-    .blinking-cursor {
-      display: inline-block;
-      width: 10px;
-      background-color: white;
-      animation: blink 1s steps(2, start) infinite;
+    .panic-red {
+      color: red;
     }
-    @keyframes blink {
-      50% {
-        background-color: transparent;
-      }
+    .panic-blue {
+      color: blue;
+    }
+    .panic-white {
+      color: white;
     }
     input {
       border: none;
@@ -49,6 +48,7 @@
     const terminal = document.getElementById('terminal');
     const commandPrompt = 'C:\\Applications>';
     let command = '';
+    let hasPanicked = false;
 
     const bootMessages = [
       { text: 'Booting Interloper Terminal...', delay: 3000 },
@@ -58,16 +58,38 @@
       { text: '(c) Interloper. All rights reserved.', delay: 0 }
     ];
 
+    const panicChance = 0.1;
+    const panicMessages = [
+      { text: 'Kernel panic: Out of memory', color: 'panic-red' },
+      { text: 'Error: Page fault in non-paged area', color: 'panic-red' },
+      { text: 'Error: Disk read failure', color: 'panic-red' },
+      { text: 'System overheating, thermal shutdown initiated', color: 'panic-red' },
+      { text: 'Attempting to restart...', color: 'panic-blue' },
+      { text: 'Rebooting network services...', color: 'panic-blue' },
+      { text: 'Applying memory reallocation...', color: 'panic-blue' },
+      { text: 'System halted unexpectedly, performing diagnostics...', color: 'panic-blue' },
+      { text: 'System boot successful', color: 'panic-white' },
+      { text: 'Checking system logs...', color: 'panic-white' },
+      { text: 'Initializing drivers...', color: 'panic-white' },
+      { text: 'Restarting hardware components...', color: 'panic-white' }
+    ];
+
     function bootSequence() {
       let messageIndex = 0;
 
       function displayNextMessage() {
         if (messageIndex < bootMessages.length) {
           const message = bootMessages[messageIndex];
-          terminal.innerHTML += message.text + '<br>';
-          messageIndex++;
 
-          setTimeout(displayNextMessage, message.delay);
+          if (message.text === 'Initializing system components...' && !hasPanicked && Math.random() < panicChance) {
+            hasPanicked = true;
+            simulateCriticalError();
+          } else {
+            terminal.innerHTML += message.text + '<br>';
+            messageIndex++;
+
+            setTimeout(displayNextMessage, message.delay);
+          }
         } else {
           terminal.innerHTML += `<br>${commandPrompt} `;
           terminal.innerHTML += '<input id="input" type="text" autofocus>';
@@ -77,6 +99,34 @@
       }
 
       displayNextMessage();
+    }
+
+    function simulateCriticalError() {
+      terminal.innerHTML += '<span class="panic-red">CRITICAL ERRORS DETECTED! AUTOMATICALLY RESOLVING...</span><br>';
+
+      setTimeout(simulateKernelPanic, 2000);
+    }
+
+    function simulateKernelPanic() {
+      terminal.innerHTML = '';
+      let panicIndex = 0;
+
+      function displayPanicMessage() {
+        if (panicIndex < 1000) {
+          const randomPanic = panicMessages[Math.floor(Math.random() * panicMessages.length)];
+          terminal.innerHTML += `<span class="${randomPanic.color}">${randomPanic.text}</span><br>`;
+          panicIndex++;
+
+          window.scrollTo(0, document.body.scrollHeight);
+
+          setTimeout(displayPanicMessage, 5);
+        } else {
+          terminal.innerHTML = '';
+          setTimeout(bootSequence, 500);
+        }
+      }
+
+      displayPanicMessage();
     }
 
     function handleCommand(event) {
