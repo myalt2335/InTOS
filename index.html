@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Terminal</title>
+  <style>
+    body {
+      background-color: black;
+      color: white;
+      font-family: monospace;
+      padding: 20px;
+    }
+    #terminal {
+      white-space: pre-wrap;
+    }
+    .blinking-cursor {
+      display: inline-block;
+      width: 10px;
+      background-color: white;
+      animation: blink 1s steps(2, start) infinite;
+    }
+    @keyframes blink {
+      50% {
+        background-color: transparent;
+      }
+    }
+    input {
+      border: none;
+      background: none;
+      color: White;
+      font-family: inherit;
+      font-size: inherit;
+      outline: none;
+      caret-color: White;
+    }
+  </style>
+</head>
+<body>
+  <div id="terminal"></div>
+  <script>
+    const websites = [
+      { name: 'Visualizer', url: 'http://interloper.wuaze.com/visualizer/index.html' },
+      { name: 'Timer', url: 'http://interloper.wuaze.com/timer/index.html' },
+      { name: 'Pathfinder', url: 'http://pathfinder.wuaze.com/' },
+      { name: 'Physics', url: 'http://physics.wuaze.com/' },
+      { name: 'Recommender', url: 'http://recommender.wuaze.com/' }
+    ];
+
+    const terminal = document.getElementById('terminal');
+    const commandPrompt = 'C:\\Applications>';
+    let command = '';
+
+    const bootMessages = [
+      { text: 'Booting Interloper Terminal...', delay: 3000 },
+      { text: 'Initializing system components...', delay: 3000 },
+      { text: 'Checking for updates...', delay: 3000 },
+      { text: 'Interloper [Version 1.0.19045.4894]', delay: 0 },
+      { text: '(c) Interloper. All rights reserved.', delay: 0 }
+    ];
+
+    function bootSequence() {
+      let messageIndex = 0;
+
+      function displayNextMessage() {
+        if (messageIndex < bootMessages.length) {
+          const message = bootMessages[messageIndex];
+          terminal.innerHTML += message.text + '<br>';
+          messageIndex++;
+
+          setTimeout(displayNextMessage, message.delay);
+        } else {
+          terminal.innerHTML += `<br>${commandPrompt} `;
+          terminal.innerHTML += '<input id="input" type="text" autofocus>';
+          document.getElementById('input').focus();
+          document.getElementById('input').addEventListener('keydown', handleCommand);
+        }
+      }
+
+      displayNextMessage();
+    }
+
+    function handleCommand(event) {
+      if (event.key === 'Enter') {
+        command = event.target.value;
+        event.target.remove();
+
+        terminal.innerHTML += `${command}<br>`;
+        processCommand(command);
+      }
+    }
+
+    function processCommand(cmd) {
+      const parts = cmd.split(' ');
+      const baseCommand = parts[0].toLowerCase();
+      const argument = parts.slice(1).join(' ');
+
+      switch (baseCommand) {
+        case 'help':
+          terminal.innerHTML += 'Available commands: help, ls, run [name], clear, dir, del, cd<br>';
+          break;
+        case 'ls':
+          terminal.innerHTML += 'Available Applications:<br>';
+          websites.forEach(site => {
+            terminal.innerHTML += `${site.name}<br>`;
+          });
+          break;
+        case 'run':
+          runApp(argument);
+          break;
+        case 'clear':
+          terminal.innerHTML = '';
+          break;
+        case 'dir':
+          terminal.innerHTML += ' Interloper32<br> Applications<br> Secrets<br>';
+          break;
+        case 'cd':
+          handleCD(argument);
+          break;
+        case 'del':
+          terminal.innerHTML += `Permission Denied: Cannot delete ${argument || 'this'} directory or file.<br>`;
+          break;
+        default:
+          terminal.innerHTML += 'Unknown command<br>';
+      }
+
+      terminal.innerHTML += `<br>${commandPrompt} <input id="input" type="text" autofocus>`;
+      document.getElementById('input').focus();
+      document.getElementById('input').addEventListener('keydown', handleCommand);
+    }
+
+    function handleCD(dir) {
+      if (dir.toLowerCase() === 'secrets' || dir.toLowerCase() === 'interloper32') {
+        terminal.innerHTML += `Access to ${dir} is restricted. Action denied.<br>`;
+      } else if (dir) {
+        terminal.innerHTML += `Directory "${dir}" not found.<br>`;
+      } else {
+        terminal.innerHTML += 'Usage: cd [directory]<br>';
+      }
+    }
+
+    function runApp(name) {
+      const site = websites.find(site => site.name.toLowerCase() === name.toLowerCase());
+      if (site) {
+        window.open(site.url, '_blank');
+        terminal.innerHTML += 'Application ran successfully.<br>';
+      } else {
+        terminal.innerHTML += `Site '${name}' not found.<br>`;
+      }
+    }
+
+    bootSequence();
+  </script>
+</body>
+</html>
