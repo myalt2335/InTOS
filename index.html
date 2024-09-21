@@ -186,7 +186,7 @@
           break;
         case 'del':
           if (argument.toLowerCase() === 'interloper32 -f') {
-            forcePanicLoop = true; // Set flag for panic loop after interloper32 deletion
+            forcePanicLoop = true;
             simulateCriticalError();
           } else {
             terminal.innerHTML += `Permission Denied: Cannot delete ${argument || 'this'} directory or file.<br>`;
