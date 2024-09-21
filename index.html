@@ -55,6 +55,8 @@
     const commandPrompt = 'C:\\Applications>';
     let command = '';
     let hasPanicked = false;
+    let forcePanicLoop = false;
+    const panicChance = 0.1; // Set this to 1.0 for 100% chance of random panic
 
     const bootMessages = [
       { text: 'Booting Interloper Terminal...', delay: 3000 },
@@ -64,7 +66,6 @@
       { text: '(c) Interloper. All rights reserved.', delay: 0 }
     ];
 
-    const panicChance = 0.1;
     const panicMessages = [
       { text: 'Kernel panic: Out of memory', color: 'panic-red' },
       { text: 'Error: Page fault in non-paged area', color: 'panic-red' },
@@ -87,20 +88,31 @@
       function displayNextMessage() {
         if (messageIndex < bootMessages.length) {
           const message = bootMessages[messageIndex];
+          terminal.innerHTML += message.text + '<br>';
 
-          if (message.text === 'Initializing system components...' && !hasPanicked && Math.random() < panicChance) {
-            hasPanicked = true;
-            simulateCriticalError();
+          if (message.text === 'Initializing system components...' && !hasPanicked) {
+            if (forcePanicLoop) {
+              setTimeout(simulateCriticalError, 2000);
+            } else if (Math.random() < panicChance) {
+              hasPanicked = true;
+              setTimeout(simulateCriticalError, 2000);
+            } else {
+              messageIndex++;
+              setTimeout(displayNextMessage, message.delay);
+            }
           } else {
-            terminal.innerHTML += message.text + '<br>';
             messageIndex++;
             setTimeout(displayNextMessage, message.delay);
           }
         } else {
-          terminal.innerHTML += `<br>${commandPrompt} `;
-          terminal.innerHTML += '<input id="input" type="text" autofocus>';
-          document.getElementById('input').focus();
-          document.getElementById('input').addEventListener('keydown', handleCommand);
+          if (forcePanicLoop) {
+            setTimeout(simulateCriticalError, 1000);
+          } else {
+            terminal.innerHTML += `<br>${commandPrompt} `;
+            terminal.innerHTML += '<input id="input" type="text" autofocus>';
+            document.getElementById('input').focus();
+            document.getElementById('input').addEventListener('keydown', handleCommand);
+          }
         }
       }
 
@@ -125,7 +137,11 @@
           setTimeout(displayPanicMessage, 2);
         } else {
           terminal.innerHTML = '';
-          setTimeout(bootSequence, 500);
+          if (forcePanicLoop) {
+            setTimeout(bootSequence, 500);
+          } else {
+            setTimeout(bootSequence, 1000);
+          }
         }
       }
 
@@ -170,10 +186,8 @@
           break;
         case 'del':
           if (argument.toLowerCase() === 'interloper32 -f') {
+            forcePanicLoop = true; // Set flag for panic loop after interloper32 deletion
             simulateCriticalError();
-            setTimeout(() => {
-              window.close();
-            }, 5000);
           } else {
             terminal.innerHTML += `Permission Denied: Cannot delete ${argument || 'this'} directory or file.<br>`;
           }
