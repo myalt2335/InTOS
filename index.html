@@ -24,6 +24,12 @@
     .panic-white {
       color: white;
     }
+    .panic-yellow {
+      color: yellow;
+    }
+    .panic-green {
+      color: #00ff00;
+    }
     input {
       border: none;
       background: none;
@@ -64,13 +70,14 @@
       { text: 'Error: Page fault in non-paged area', color: 'panic-red' },
       { text: 'Error: Disk read failure', color: 'panic-red' },
       { text: 'System overheating, thermal shutdown initiated', color: 'panic-red' },
-      { text: 'Attempting to restart...', color: 'panic-blue' },
+      { text: 'Warning: CPU usage nearing critical levels', color: 'panic-yellow' },
+      { text: 'Warning: Disk space below 10%', color: 'panic-yellow' },
+      { text: 'System self-repair in progress', color: 'panic-green' },
+      { text: 'Recovery successful, system restored', color: 'panic-green' },
       { text: 'Rebooting network services...', color: 'panic-blue' },
       { text: 'Applying memory reallocation...', color: 'panic-blue' },
-      { text: 'System halted unexpectedly, performing diagnostics...', color: 'panic-blue' },
       { text: 'System boot successful', color: 'panic-white' },
       { text: 'Checking system logs...', color: 'panic-white' },
-      { text: 'Initializing drivers...', color: 'panic-white' },
       { text: 'Restarting hardware components...', color: 'panic-white' }
     ];
 
@@ -87,7 +94,6 @@
           } else {
             terminal.innerHTML += message.text + '<br>';
             messageIndex++;
-
             setTimeout(displayNextMessage, message.delay);
           }
         } else {
@@ -103,7 +109,6 @@
 
     function simulateCriticalError() {
       terminal.innerHTML += '<span class="panic-red">CRITICAL ERRORS DETECTED! AUTOMATICALLY RESOLVING...</span><br>';
-
       setTimeout(simulateKernelPanic, 2000);
     }
 
@@ -116,10 +121,8 @@
           const randomPanic = panicMessages[Math.floor(Math.random() * panicMessages.length)];
           terminal.innerHTML += `<span class="${randomPanic.color}">${randomPanic.text}</span><br>`;
           panicIndex++;
-
           window.scrollTo(0, document.body.scrollHeight);
-
-          setTimeout(displayPanicMessage, 5);
+          setTimeout(displayPanicMessage, 2);
         } else {
           terminal.innerHTML = '';
           setTimeout(bootSequence, 500);
@@ -133,7 +136,6 @@
       if (event.key === 'Enter') {
         command = event.target.value;
         event.target.remove();
-
         terminal.innerHTML += `${command}<br>`;
         processCommand(command);
       }
@@ -167,7 +169,14 @@
           handleCD(argument);
           break;
         case 'del':
-          terminal.innerHTML += `Permission Denied: Cannot delete ${argument || 'this'} directory or file.<br>`;
+          if (argument.toLowerCase() === 'interloper32 -f') {
+            simulateCriticalError();
+            setTimeout(() => {
+              window.close();
+            }, 5000);
+          } else {
+            terminal.innerHTML += `Permission Denied: Cannot delete ${argument || 'this'} directory or file.<br>`;
+          }
           break;
         default:
           terminal.innerHTML += 'Unknown command<br>';
