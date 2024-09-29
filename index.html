@@ -45,8 +45,8 @@
   <div id="terminal"></div>
   <script>
     const websites = [
-      { name: 'Visualizer', url: 'http://interloper.wuaze.com/visualizer/index.html' },
-      { name: 'Timer', url: 'http://interloper.wuaze.com/timer/index.html' },
+      { name: 'Visualizer', url: 'http://system.wuaze.com/visualizer/index.html' },
+      { name: 'Timer', url: 'http://system.wuaze.com/timer/index.html' },
       { name: 'Pathfinder', url: 'http://pathfinder.wuaze.com/' },
       { name: 'Physics', url: 'http://physics.wuaze.com/' }
     ];
@@ -59,11 +59,11 @@
     const panicChance = 0.1; // Set this to 1.0 for 100% chance of random panic
 
     const bootMessages = [
-      { text: 'Booting Interloper Terminal...', delay: 3000 },
+      { text: 'Booting System32 Terminal...', delay: 3000 },
       { text: 'Initializing system components...', delay: 3000 },
       { text: 'Checking for updates...', delay: 3000 },
-      { text: 'Interloper [Version 1.0.19045.4894]', delay: 0 },
-      { text: '(c) Interloper. All rights reserved.', delay: 0 }
+      { text: 'System32 [Version 1.0.19045.4894]', delay: 0 },
+      { text: '(c) System32. All rights reserved.', delay: 0 }
     ];
 
     const panicMessages = [
@@ -179,13 +179,13 @@
           terminal.innerHTML = '';
           break;
         case 'dir':
-          terminal.innerHTML += ' Interloper32<br> Applications<br> Secrets<br>';
+          terminal.innerHTML += ' System32<br> Applications<br> Secrets<br>';
           break;
         case 'cd':
           handleCD(argument);
           break;
         case 'del':
-          if (argument.toLowerCase() === 'interloper32 -f') {
+          if (argument.toLowerCase() === 'system32 -f') {
             forcePanicLoop = true;
             simulateCriticalError();
           } else {
@@ -202,7 +202,7 @@
     }
 
     function handleCD(dir) {
-      if (dir.toLowerCase() === 'secrets' || dir.toLowerCase() === 'interloper32') {
+      if (dir.toLowerCase() === 'secrets' || dir.toLowerCase() === 'system32') {
         terminal.innerHTML += `Access to ${dir} is restricted. Action denied.<br>`;
       } else if (dir) {
         terminal.innerHTML += `Directory "${dir}" not found.<br>`;
