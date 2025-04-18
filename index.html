@@ -4,51 +4,83 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Terminal</title>
-  <style>
-    body {
-      background-color: black;
-      color: white;
-      font-family: monospace;
-      padding: 20px;
-      overflow-y: auto;
+   <style>
+  body {
+    background-color: black;
+    color: #00ff00;
+    font-family: monospace;
+    padding: 20px;
+    overflow-y: auto;
+    text-shadow: 0 0 5px #00ff00, 0 0 10px #00ff00, 0 0 20px #00ff00;
+    transform: scale(1);
+    perspective: 1000px;
+    box-shadow: inset 0 0 50px rgba(0, 0, 0, 0.5);
+    animation: flicker 0.1s infinite;
+  }
+  #terminal {
+    white-space: pre-wrap;
+    color: #00ff00;
+  }
+  .panic-red {
+    color: red;
+  }
+  .panic-blue {
+    color: blue;
+  }
+  .panic-white {
+    color: white;
+  }
+  .panic-yellow {
+    color: yellow;
+  }
+  .panic-green {
+    color: #00ff00;
+  }
+  input {
+    border: none;
+    background: none;
+    color: #00ff00;
+    font-family: inherit;
+    font-size: inherit;
+    outline: none;
+    caret-color: #00ff00;
+    text-shadow: 0 0 5px #00ff00, 0 0 10px #00ff00, 0 0 20px #00ff00;
+    animation: flicker 0.1s infinite;
+  }
+  body::after {
+    content: "";
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: repeating-linear-gradient(
+      0deg,
+      rgba(0, 0, 0, 0.1),
+      rgba(0, 0, 0, 0.1) 1px,
+      rgba(0, 0, 0, 0.2) 2px
+    );
+    pointer-events: none;
+    z-index: 10;
+  }
+  @keyframes flicker {
+    0%, 49%, 100% {
+      opacity: 1;
     }
-    #terminal {
-      white-space: pre-wrap;
+    50% {
+      opacity: 0.95;
     }
-    .panic-red {
-      color: red;
-    }
-    .panic-blue {
-      color: blue;
-    }
-    .panic-white {
-      color: white;
-    }
-    .panic-yellow {
-      color: yellow;
-    }
-    .panic-green {
-      color: #00ff00;
-    }
-    input {
-      border: none;
-      background: none;
-      color: White;
-      font-family: inherit;
-      font-size: inherit;
-      outline: none;
-      caret-color: White;
-    }
-  </style>
+  }
+</style>
 </head>
 <body>
   <div id="terminal"></div>
   <script>
     const websites = [
-      { name: 'Visualizer', url: 'http://system.wuaze.com/visualizer/index.html' },
-      { name: 'Timer', url: 'http://system.wuaze.com/timer/index.html' },
-      { name: 'Pathfinder', url: 'http://pathfinder.wuaze.com/' },
-      { name: 'Physics', url: 'http://physics.wuaze.com/' }
+      { name: 'Visualizer', url: 'http://interloper.wuaze.com/visualizer/index.html' },
+      { name: 'Physics', url: 'http://physics.wuaze.com/' },
+	  { name: 'Clicker', url: 'http://interloper.wuaze.com/clicker/index.html' },
+	  { name: 'Solar System', url: 'http://interloper.wuaze.com/sim/index.html' }
     ];
 
     const terminal = document.getElementById('terminal');
@@ -56,13 +88,13 @@
     let command = '';
     let hasPanicked = false;
     let forcePanicLoop = false;
-    const panicChance = 0.1; // Set this to 1.0 for 100% chance of random panic
+    const panicChance = 0; // Set this to 1.0 for 100% chance of random panic, 0.x values are essentially x100, 0.5 = 50% etc.
 
     const bootMessages = [
-      { text: 'Booting Interloper Terminal...', delay: 3000 },
+      { text: 'Booting IntOS Terminal...', delay: 3000 },
       { text: 'Initializing system components...', delay: 3000 },
-      { text: 'Checking for updates...', delay: 3000 },
-      { text: 'Interloper [Version 1.0.19045.4894]', delay: 0 },
+      { text: 'Checking for updates...', delay: 3000 }, // ideally it'd wait for the delay then clear but whatever
+      { text: 'Interloper [Version 3.1.21045.5895]', delay: 0 },
       { text: '(c) Interloper. All rights reserved.', delay: 0 }
     ];
 
@@ -179,17 +211,17 @@
           terminal.innerHTML = '';
           break;
         case 'dir':
-          terminal.innerHTML += ' System32<br> Applications<br> Secrets<br>';
+          terminal.innerHTML += ' Interloper32<br> Applications<br> Secrets<br>';
           break;
         case 'cd':
           handleCD(argument);
           break;
         case 'del':
-          if (argument.toLowerCase() === 'system32 -f') {
+          if (argument.toLowerCase() === 'interloper32 -f') {
             forcePanicLoop = true;
             simulateCriticalError();
           } else {
-            terminal.innerHTML += `Permission Denied: Cannot delete ${argument || 'this'} directory or file.<br>`;
+            terminal.innerHTML += `Permission Denied: Cannot delete ${argument || 'this'}<br>`;
           }
           break;
         default:
@@ -202,7 +234,7 @@
     }
 
     function handleCD(dir) {
-      if (dir.toLowerCase() === 'secrets' || dir.toLowerCase() === 'system32') {
+      if (dir.toLowerCase() === 'secrets' || dir.toLowerCase() === 'interloper32') {
         terminal.innerHTML += `Access to ${dir} is restricted. Action denied.<br>`;
       } else if (dir) {
         terminal.innerHTML += `Directory "${dir}" not found.<br>`;
